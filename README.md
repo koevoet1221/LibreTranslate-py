@@ -5,7 +5,7 @@ Python bindings to connect to a [LibreTranslate API](https://github.com/LibreTra
 https://pypi.org/project/libretranslatepy/
 
 ## Install
-clone the repo into your working directory
+```add git+https://github.com/koevoet1221/LibreTranslate-py.git```
 
 ## Fork difference
 This versions accepts both strings and lists of strings.
