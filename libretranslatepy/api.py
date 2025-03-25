@@ -2,6 +2,7 @@ import json
 import sys
 from typing import Any, Dict
 from urllib import request, parse
+import requests
 
 
 class LibreTranslateAPI:
@@ -39,27 +40,33 @@ class LibreTranslateAPI:
         if self.url[-1] != "/":
             self.url += "/"
 
-    def translate(self, q: str, source: str = "en", target: str = "es", timeout: int | None = None) -> Any:
-        """Translate string
+    def translate(self, q, source: str = "en", target: str = "es", timeout: int | None = None) -> Any:
+        """Translate string or list of strings
 
         Args:
-            q (str): The text to translate
+            q (str or list(str)): The text to translate
             source (str): The source language code (ISO 639)
             target (str): The target language code (ISO 639)
             timeout (int): Request timeout in seconds
 
         Returns:
-            str: The translated text
+            str or list(str): The translated text
         """
         url = self.url + "translate"
-        params: Dict[str, str] = {"q": q, "source": source, "target": target}
+        
+        data = {
+            "q": q,
+            "source": source,
+            "target": target
+        }
         if self.api_key is not None:
-            params["api_key"] = self.api_key
-        url_params = parse.urlencode(params)
-        req = request.Request(url, data=url_params.encode())
-        response = request.urlopen(req, timeout = timeout)
-        response_str = response.read().decode()
-        return json.loads(response_str)["translatedText"]
+            data["api_key"] = self.api_key
+        try:
+            response = requests.post(url, json=data)
+        except Exception as e:
+            print("error while translating, ", e)
+            return q
+        return json.loads(response.text)["translatedText"]
 
     def detect(self, q: str, timeout: int | None = None) -> Any:
         """Detect the language of a single text.
